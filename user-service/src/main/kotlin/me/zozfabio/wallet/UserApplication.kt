@@ -1,28 +1,21 @@
-package me.zozfabio.wallet.user
+package me.zozfabio.wallet
 
-import com.commercehub.jackson.datatype.mongo.MongoModule
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.beans.factory.annotation.Autowired
+import me.zozfabio.wallet.user.service.UserService
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.cloud.stream.annotation.EnableBinding
-import org.springframework.cloud.stream.messaging.Sink
+import org.springframework.cloud.stream.messaging.Source
 import org.springframework.context.annotation.Bean
 
-@EnableBinding(Sink::class)
+@EnableBinding(Source::class)
 class IntegrationConfig
 
 @SpringBootApplication
-class UserViewApplication {
-
-    @Autowired
-    fun runner(objectMapper: ObjectMapper) {
-        objectMapper.registerModule(MongoModule())
-    }
+class UserApplication {
 
     @Bean
-    fun appRunner() =
+    fun appRunner(users: UserService) =
         ApplicationRunner {
 //            println("inicio")
 //                Flux.just("a", "b")
@@ -62,21 +55,24 @@ class UserViewApplication {
 //                .log()
 //                .subscribe()
 
-//            userEvents.findAll()
-//                .groupBy { it.userId }
-//                .flatMap { Mono.zip(Mono.justOrEmpty(it.key()), it.collectList()) }
-//                .map { UserView.recreate(it.t1, it.t2) }
-//                .flatMap { usersView.save(it) }
-//                .subscribe()
-
 //            Mono.just("1")
 //                .delayElement(Duration.ofSeconds(1))
 //                .or(Mono.just("2"))
 //                .log()
 //                .subscribe()
+
+//            users.save(User.create("User 1", "people1@test.com"))
+//                .doOnNext { println("User Created: $it") }
+//                .log()
+//                .then(users.findFirstByEmail("people1@test.com")
+//                    .doOnNext { println("User Finded: $it") }
+//                    .log())
+//                .subscribe()
+
+//            users.default()
         }
 }
 
 fun main(args: Array<String>) {
-    runApplication<UserViewApplication>(*args)
+    runApplication<UserApplication>(*args)
 }

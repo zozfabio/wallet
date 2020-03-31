@@ -1,12 +1,7 @@
 package me.zozfabio.wallet.user.domain.events
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeName
-import me.zozfabio.wallet.user.domain.CONTACT_USER_DEFINED_TYPE_NAME
 import java.time.Instant
 
-@JsonTypeName(CONTACT_USER_DEFINED_TYPE_NAME)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = ContactUserDefined::class)
 data class ContactUserDefined(override val userId: String,
                               val contactId: String,
                               val contactUserId: String,

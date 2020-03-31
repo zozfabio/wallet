@@ -4,8 +4,8 @@ import me.zozfabio.wallet.user.domain.commands.*
 import me.zozfabio.wallet.user.domain.entities.Contact
 import me.zozfabio.wallet.user.domain.entities.User
 import me.zozfabio.wallet.user.domain.events.*
-import me.zozfabio.wallet.user.domain.repository.ContactRepository
-import me.zozfabio.wallet.user.domain.repository.UserRepository
+import me.zozfabio.wallet.user.domain.repositories.ContactRepository
+import me.zozfabio.wallet.user.domain.repositories.UserRepository
 import org.springframework.cloud.stream.messaging.Source
 import org.springframework.messaging.support.MessageBuilder.withPayload
 import org.springframework.stereotype.Service

@@ -1,4 +1,4 @@
-package me.zozfabio.wallet.user.domain.repository
+package me.zozfabio.wallet.user.domain.repositories
 
 import me.zozfabio.wallet.user.domain.entities.User
 import org.springframework.data.repository.CrudRepository
