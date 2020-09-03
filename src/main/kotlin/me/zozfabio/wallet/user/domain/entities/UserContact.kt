@@ -4,8 +4,8 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document("Contact")
-@TypeAlias("Contact")
+@Document("UserContact")
+@TypeAlias("UserContact")
 data class UserContact(@Id val id: String,
                        val userId: String,
                        val email: String,
