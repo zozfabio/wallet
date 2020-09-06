@@ -19,19 +19,23 @@ data class UserView(@Id var id: String = "") {
 
     val contacts: MutableSet<UserViewContact> = mutableSetOf()
 
+    val pendingMoneyRequestTransactionIds: MutableSet<String> = mutableSetOf()
+
     @PersistenceConstructor
     constructor(id: String,
                 name: String,
                 email: String,
-                contacts: Iterable<UserViewContact>) : this(id) {
+                contacts: Iterable<UserViewContact>,
+                pendingMoneyRequestTransactionIds: Iterable<String>) : this(id) {
         this.name = name
         this.email = email
         this.contacts.addAll(contacts)
+        this.pendingMoneyRequestTransactionIds.addAll(pendingMoneyRequestTransactionIds)
     }
 
     companion object Factory {
         fun create(id: String, name: String, email: String): UserView {
-            return UserView(id, name, email, setOf());
+            return UserView(id, name, email, setOf(), setOf())
         }
     }
 
@@ -44,7 +48,18 @@ data class UserView(@Id var id: String = "") {
         return this
     }
 
-    fun addMoney(money: BigDecimal) {
-        balance = balance.add(money)
+    fun addMoney(value: BigDecimal): UserView {
+        balance = balance.add(value)
+        return this
+    }
+
+    fun removeMoney(value: BigDecimal): UserView {
+        balance = balance.minus(value)
+        return this
+    }
+
+    fun addPendingMoneyRequestTransactionId(transactionId: String): UserView {
+        pendingMoneyRequestTransactionIds.add(transactionId)
+        return this
     }
 }
