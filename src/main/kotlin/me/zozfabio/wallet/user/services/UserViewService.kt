@@ -1,4 +1,4 @@
-package me.zozfabio.wallet.user.domain.services
+package me.zozfabio.wallet.user.services
 
 import me.zozfabio.wallet.user.domain.entities.UserView
 import me.zozfabio.wallet.user.domain.entities.UserViewContact

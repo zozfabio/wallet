@@ -1,8 +1,8 @@
-package me.zozfabio.wallet.user.domain.services
+package me.zozfabio.wallet.user.services
 
 import me.zozfabio.wallet.user.domain.commands.*
-import me.zozfabio.wallet.user.domain.entities.UserContact
 import me.zozfabio.wallet.user.domain.entities.User
+import me.zozfabio.wallet.user.domain.entities.UserContact
 import me.zozfabio.wallet.user.domain.events.*
 import me.zozfabio.wallet.user.domain.repositories.ContactRepository
 import me.zozfabio.wallet.user.domain.repositories.UserRepository

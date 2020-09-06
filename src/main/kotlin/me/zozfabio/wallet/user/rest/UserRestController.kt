@@ -3,9 +3,9 @@ package me.zozfabio.wallet.user.rest
 import me.zozfabio.wallet.user.domain.commands.*
 import me.zozfabio.wallet.user.domain.entities.UserView
 import me.zozfabio.wallet.user.domain.exceptions.EntityNotFoundException
-import me.zozfabio.wallet.user.domain.services.TransactionService
-import me.zozfabio.wallet.user.domain.services.UserService
-import me.zozfabio.wallet.user.domain.services.UserViewService
+import me.zozfabio.wallet.user.services.TransactionService
+import me.zozfabio.wallet.user.services.UserService
+import me.zozfabio.wallet.user.services.UserViewService
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
 
