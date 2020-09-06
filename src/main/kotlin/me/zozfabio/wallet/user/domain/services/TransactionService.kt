@@ -4,10 +4,8 @@ import me.zozfabio.wallet.user.domain.commands.AddMoney
 import me.zozfabio.wallet.user.domain.commands.RequestMoney
 import me.zozfabio.wallet.user.domain.commands.SendMoney
 import me.zozfabio.wallet.user.domain.entities.Transaction
-import me.zozfabio.wallet.user.domain.events.MoneyAdded
-import me.zozfabio.wallet.user.domain.events.MoneyRequested
-import me.zozfabio.wallet.user.domain.events.MoneySent
-import me.zozfabio.wallet.user.domain.events.TransactionEvent
+import me.zozfabio.wallet.user.domain.entities.UserBalance
+import me.zozfabio.wallet.user.domain.events.*
 import me.zozfabio.wallet.user.domain.repositories.TransactionRepository
 import me.zozfabio.wallet.user.domain.repositories.UserBalanceRepository
 import org.springframework.stereotype.Service
@@ -66,6 +64,17 @@ class TransactionService(val users: UserBalanceRepository,
             is MoneyAdded -> handle(e)
             is MoneySent -> handle(e)
             is MoneyRequested -> handle(e)
+        }
+    }
+
+    private fun handle(e: UserCreated) =
+        UserBalance(e.userId)
+            .let { users.save(it) }
+
+    @TransactionalEventListener
+    fun handle(e: UserEvent) {
+        when(e) {
+            is UserCreated -> handle(e)
         }
     }
 }

@@ -5,11 +5,12 @@ import org.springframework.data.annotation.PersistenceConstructor
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 
 @Document("UserBalance")
 @TypeAlias("UserBalance")
 data class UserBalance(@Id val userId: String,
-                       var userBalance: BigDecimal) {
+                       var userBalance: BigDecimal = ZERO) {
 
     private val pendingMoneyRequestTransactionIds: MutableSet<String> = mutableSetOf()
 

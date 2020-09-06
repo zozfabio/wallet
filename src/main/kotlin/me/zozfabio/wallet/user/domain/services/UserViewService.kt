@@ -2,7 +2,10 @@ package me.zozfabio.wallet.user.domain.services
 
 import me.zozfabio.wallet.user.domain.entities.UserView
 import me.zozfabio.wallet.user.domain.entities.UserViewContact
-import me.zozfabio.wallet.user.domain.events.*
+import me.zozfabio.wallet.user.domain.events.ContactAdded
+import me.zozfabio.wallet.user.domain.events.UserCreated
+import me.zozfabio.wallet.user.domain.events.UserEvent
+import me.zozfabio.wallet.user.domain.events.UserUpdated
 import me.zozfabio.wallet.user.domain.repositories.UserViewRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.event.TransactionalEventListener
@@ -38,15 +41,6 @@ class UserViewService(val users : UserViewRepository) {
             is UserCreated -> handle(e)
             is UserUpdated -> handle(e)
             is ContactAdded -> handle(e)
-        }
-    }
-
-    @TransactionalEventListener
-    fun handle(e: TransactionEvent) {
-        when (e) {
-            is MoneyAdded -> handle(e)
-            is MoneySent -> handle(e)
-            is MoneyRequested -> handle(e)
         }
     }
 }
