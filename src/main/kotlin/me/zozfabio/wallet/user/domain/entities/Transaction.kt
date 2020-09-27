@@ -1,6 +1,7 @@
 package me.zozfabio.wallet.user.domain.entities
 
 import me.zozfabio.wallet.user.domain.events.MoneyAdded
+import me.zozfabio.wallet.user.domain.events.MoneyRequestAccepted
 import me.zozfabio.wallet.user.domain.events.MoneyRequested
 import me.zozfabio.wallet.user.domain.events.MoneySent
 import me.zozfabio.wallet.user.domain.exceptions.InsufficientFundsException
@@ -14,7 +15,7 @@ import org.springframework.data.domain.AbstractAggregateRoot
 import org.springframework.data.mongodb.core.mapping.Document
 import java.math.BigDecimal
 import java.time.Instant
-import java.util.*
+import java.util.UUID.randomUUID
 
 @Document("Transaction")
 @TypeAlias("Transaction")
@@ -45,7 +46,7 @@ data class Transaction(@Id var id: String = "") : AbstractAggregateRoot<Transact
 
     companion object Factory {
         fun addMoney(to: UserBalance, value: BigDecimal): Transaction {
-            val transaction = Transaction(UUID.randomUUID().toString())
+            val transaction = Transaction(randomUUID().toString())
             return transaction.moneyAdded(MoneyAdded(
                 transaction.id,
                 to.userId,
@@ -59,7 +60,7 @@ data class Transaction(@Id var id: String = "") : AbstractAggregateRoot<Transact
             if (value.compareTo(from.userBalance) == 1) {
                 throw InsufficientFundsException("Insufficient Funds {}", from.userBalance)
             }
-            val transaction = Transaction(UUID.randomUUID().toString())
+            val transaction = Transaction(randomUUID().toString())
             return transaction.moneySent(MoneySent(
                 transaction.id,
                 from.userId,
@@ -70,7 +71,7 @@ data class Transaction(@Id var id: String = "") : AbstractAggregateRoot<Transact
         }
 
         fun requestMoney(from: UserBalance, to: UserBalance, value: BigDecimal): Transaction {
-            val transaction = Transaction(UUID.randomUUID().toString())
+            val transaction = Transaction(randomUUID().toString())
             return transaction.moneyRequested(MoneyRequested(
                 transaction.id,
                 from.userId,
@@ -103,7 +104,6 @@ data class Transaction(@Id var id: String = "") : AbstractAggregateRoot<Transact
     }
 
     private fun moneyRequested(e: MoneyRequested): Transaction {
-        id = e.transactionId
         fromUserId = e.fromUserId
         toUserId = e.toUserId
         value = e.value
@@ -113,28 +113,21 @@ data class Transaction(@Id var id: String = "") : AbstractAggregateRoot<Transact
         return andEvent(e)
     }
 
-//    fun acceptMoneyRequest(transaction: Transaction): TransactionUser {
-//        if (transaction.value.compareTo(balance) == 1) {
-//            throw InsufficientFundsException("Insufficient Funds {}!", balance)
-//        }
-//        if (!pendingMoneyRequestTransactions.contains(transaction.id)) {
-//            throw InvalidTransactionException("Invalid Money Request Transaction {}!", transaction.id)
-//        }
-//        return moneyRequestAccepted(MoneyRequestAccepted(transaction.id, userId, transaction.toUserId, transaction.value, Instant.now()))
-//    }
-//
-//    private fun moneyRequestAccepted(e: MoneyRequestAccepted): TransactionUser {
-//        balance = balance.minus(e.value)
-//        pendingMoneyRequestTransactions.remove(e.transactionId)
-//        return andEvent(e)
-//    }
-//
-//    fun handle(e: TransactionEvent) {
-//        when (e) {
-//            is MoneyAdded -> moneyAdded(e)
-//            is MoneySent -> moneySent(e)
-//            is MoneyRequested -> moneyRequested(e)
-//            is MoneyRequestAccepted -> moneyRequestAccepted(e)
-//        }
-//    }
+    fun acceptMoneyRequest(from: UserBalance): Transaction {
+        if (value.compareTo(from.userBalance) == 1) {
+            throw InsufficientFundsException("Insufficient Funds {}!", from.userBalance)
+        }
+        return moneyRequestAccepted(MoneyRequestAccepted(
+            id,
+            fromUserId,
+            toUserId,
+            value,
+            Instant.now()
+        ))
+    }
+
+    private fun moneyRequestAccepted(e: MoneyRequestAccepted): Transaction {
+        status = TransactionStatus.ACCEPTED
+        return andEvent(e)
+    }
 }

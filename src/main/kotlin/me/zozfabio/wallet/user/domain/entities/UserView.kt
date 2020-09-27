@@ -19,18 +19,18 @@ data class UserView(@Id var id: String = "") {
 
     val contacts: MutableSet<UserViewContact> = mutableSetOf()
 
-    val pendingMoneyRequestTransactionIds: MutableSet<String> = mutableSetOf()
+    val pendingMoneyRequests: MutableSet<UserViewPendingMoneyRequest> = mutableSetOf()
 
     @PersistenceConstructor
     constructor(id: String,
-                name: String,
-                email: String,
-                contacts: Iterable<UserViewContact>,
-                pendingMoneyRequestTransactionIds: Iterable<String>) : this(id) {
-        this.name = name
-        this.email = email
-        this.contacts.addAll(contacts)
-        this.pendingMoneyRequestTransactionIds.addAll(pendingMoneyRequestTransactionIds)
+                name: String?,
+                email: String?,
+                contacts: Iterable<UserViewContact>?,
+                pendingMoneyRequests: Iterable<UserViewPendingMoneyRequest>?) : this(id) {
+        name?.let { this.name = it }
+        email?.let { this.email = it }
+        contacts?.let { this.contacts.addAll(it) }
+        pendingMoneyRequests?.let { this.pendingMoneyRequests.addAll(it) }
     }
 
     companion object Factory {
@@ -58,8 +58,13 @@ data class UserView(@Id var id: String = "") {
         return this
     }
 
-    fun addPendingMoneyRequestTransactionId(transactionId: String): UserView {
-        pendingMoneyRequestTransactionIds.add(transactionId)
+    fun addPendingMoneyRequest(pendingMoneyRequest: UserViewPendingMoneyRequest): UserView {
+        pendingMoneyRequests.add(pendingMoneyRequest)
+        return this
+    }
+
+    fun removePendingMoneyRequest(transactionId: String): UserView {
+        pendingMoneyRequests.removeIf { transactionId == it.transactionId }
         return this
     }
 }

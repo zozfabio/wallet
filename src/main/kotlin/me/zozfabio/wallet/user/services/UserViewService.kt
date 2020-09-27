@@ -2,10 +2,14 @@ package me.zozfabio.wallet.user.services
 
 import me.zozfabio.wallet.user.domain.entities.UserView
 import me.zozfabio.wallet.user.domain.entities.UserViewContact
+import me.zozfabio.wallet.user.domain.entities.UserViewPendingMoneyRequest
 import me.zozfabio.wallet.user.domain.events.*
+import me.zozfabio.wallet.user.domain.exceptions.EntityNotFoundException
 import me.zozfabio.wallet.user.domain.repositories.UserViewRepository
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
-import org.springframework.transaction.event.TransactionalEventListener
+import org.springframework.transaction.annotation.Propagation.MANDATORY
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -32,7 +36,8 @@ class UserViewService(val users : UserViewRepository) {
                 .ifPresent { users.save(it.addContact(contact)) } }
     }
 
-    @TransactionalEventListener
+    @EventListener
+    @Transactional(propagation = MANDATORY)
     fun handle(e: UserEvent) {
         when (e) {
             is UserCreated -> handle(e)
@@ -56,16 +61,34 @@ class UserViewService(val users : UserViewRepository) {
             }
 
     private fun handle(e: MoneyRequested) =
-        users.findById(e.toUserId)
-            .map { it.addPendingMoneyRequestTransactionId(e.transactionId) }
+        users.findById(e.fromUserId)
+            .flatMap { from -> users.findById(e.toUserId)
+                .map { to -> Pair(from, to) } }
+            .map {
+                UserViewPendingMoneyRequest(e.transactionId, it.first.name, it.first.email, e.value)
+                    .let { pmr -> it.second.addPendingMoneyRequest(pmr) }
+            }
             .ifPresent { users.save(it) }
 
-    @TransactionalEventListener
+    private fun handle(e: MoneyRequestAccepted) {
+        val fromUser = users.findById(e.fromUserId)
+            .orElseThrow { EntityNotFoundException("User not found!") }
+        val toUser = users.findById(e.toUserId)
+            .orElseThrow { EntityNotFoundException("User not found!") }
+
+        users.save(fromUser.addMoney(e.value))
+        users.save(toUser.removeMoney(e.value)
+            .removePendingMoneyRequest(e.transactionId))
+    }
+
+    @EventListener
+    @Transactional(propagation = MANDATORY)
     fun handle(e: TransactionEvent) {
         when(e) {
             is MoneyAdded -> handle(e)
             is MoneySent -> handle(e)
             is MoneyRequested -> handle(e)
+            is MoneyRequestAccepted -> handle(e)
         }
     }
 }
